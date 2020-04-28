@@ -11,6 +11,7 @@ public class BaseScreen implements Screen, InputProcessor {
 
     @Override
     public void show() {
+        Gdx.input.setInputProcessor(this);
         batch = new SpriteBatch();
 
     }
@@ -39,41 +40,49 @@ public class BaseScreen implements Screen, InputProcessor {
 
     @Override
     public void hide() {
+
         dispose();
     }
 
     @Override
     public void dispose() {
+
         batch.dispose();
     }
 
     @Override
     public boolean keyDown(int keycode) {
+
         return false;
     }
 
     @Override
     public boolean keyUp(int keycode) {
+
         return false;
     }
 
     @Override
     public boolean keyTyped(char character) {
+
         return false;
     }
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+
         return false;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+
         return false;
     }
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
+
         return false;
     }
 
@@ -84,6 +93,7 @@ public class BaseScreen implements Screen, InputProcessor {
 
     @Override
     public boolean scrolled(int amount) {
+
         return false;
     }
 }

@@ -11,25 +11,34 @@ public class MenuScreen extends BaseScreen {
     private Texture background;
     private Texture star;
 
-    private Vector2 starPosition;
-    private Vector2 vel;
+    private Vector2 starPos;
+    private Vector2 touch;
+    private Vector2 move;
+    private float lenPath;
 
     @Override
     public void show() {
         super.show();
         background = new Texture("background.jpg");
         star = new Texture("star.png");
-        starPosition = new Vector2(0,0);
-        vel = new Vector2(1,1);
+        starPos = new Vector2(0,0);
+        touch = new Vector2();
+        move = new Vector2(0, 0);
     }
 
     @Override
     public void render(float delta) {
         super.render(delta);
-        starPosition.add(vel);
+
+        starPos.add(move);
+        lenPath = lenPath - move.len();
+        if(lenPath < 0.0f){
+            move.set(0.0f,0.0f);
+            starPos.set(touch.x, touch.y);
+        }
         batch.begin();
         batch.draw(background, 0, 0);
-        batch.draw(star, starPosition.x, starPosition.y);
+        batch.draw(star, starPos.x, starPos.y);
         batch.end();
     }
 
@@ -38,5 +47,14 @@ public class MenuScreen extends BaseScreen {
         background.dispose();
         star.dispose();
         super.dispose();
+    }
+
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        touch.set(screenX, Gdx.graphics.getHeight() - screenY);
+        move = touch.cpy().sub(starPos);
+        lenPath = move.len();
+        move.nor();
+        return super.touchDown(screenX, screenY, pointer, button);
     }
 }
