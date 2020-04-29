@@ -50,6 +50,11 @@ public class MenuScreen extends BaseScreen {
     }
 
     @Override
+    public void resize(int width, int height) {
+        batch.getProjectionMatrix().setToOrtho2D(0,0,width,height);
+    }
+
+    @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         touch.set(screenX, Gdx.graphics.getHeight() - screenY);
         move = touch.cpy().sub(starPos);

@@ -20,69 +20,57 @@ public class BaseScreen implements Screen, InputProcessor {
     public void render(float delta) {
         Gdx.gl.glClearColor(1, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
     }
 
     @Override
     public void resize(int width, int height) {
-
     }
 
     @Override
     public void pause() {
-
     }
 
     @Override
     public void resume() {
-
     }
 
     @Override
     public void hide() {
-
         dispose();
     }
 
     @Override
     public void dispose() {
-
         batch.dispose();
     }
 
     @Override
     public boolean keyDown(int keycode) {
-
         return false;
     }
 
     @Override
     public boolean keyUp(int keycode) {
-
         return false;
     }
 
     @Override
     public boolean keyTyped(char character) {
-
         return false;
     }
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-
         return false;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-
         return false;
     }
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-
         return false;
     }
 
@@ -93,7 +81,6 @@ public class BaseScreen implements Screen, InputProcessor {
 
     @Override
     public boolean scrolled(int amount) {
-
         return false;
     }
 }
