@@ -12,6 +12,8 @@ import ru.geekbrains.math.Rect;
 
 public class Starship extends Sprite {
 
+    private Rect worldBounds;
+
     private Vector2 temp;
     private Vector2 distance;
     private float speed;
@@ -25,6 +27,7 @@ public class Starship extends Sprite {
         super(atlas.findRegion("main_ship"), screenController);
         TextureRegion buf = atlas.findRegion("main_ship");
         TextureRegion[][] reg = buf.split(buf.getRegionWidth()/2, buf.getRegionHeight());
+        worldBounds = new Rect();
         this.regions[0] = reg[0][0];
         this.temp = new Vector2();
         this.distance = new Vector2(this.pos);
@@ -38,6 +41,7 @@ public class Starship extends Sprite {
 
     @Override
     public void resize(Rect worldBounds) {
+        this.worldBounds = worldBounds;
         setHeightProportion(0.2f);
         this.pos.set(worldBounds.pos);
     }
@@ -57,10 +61,10 @@ public class Starship extends Sprite {
             temp.setZero();
         }
 
-        if (left) pos.x -= speed * delta;
-        if (up) pos.y += speed * delta;
-        if (down) pos.y -= speed * delta;
-        if (right) pos.x += speed * delta;
+        if (left && getLeft() >= worldBounds.getLeft()) pos.x -= speed * delta;
+        if (up && getTop() <= worldBounds.getTop()) pos.y += speed * delta;
+        if (down && getBottom() >= worldBounds.getBottom()) pos.y -= speed * delta;
+        if (right && getRight() <= worldBounds.getRight()) pos.x += speed * delta;
 
     }
 
