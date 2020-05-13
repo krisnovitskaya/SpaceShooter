@@ -2,6 +2,7 @@ package ru.geekbrains.sprite;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
@@ -10,8 +11,8 @@ import ru.geekbrains.controller.ScreenController;
 import ru.geekbrains.math.Rect;
 
 public class ButtonExit extends Sprite {
-    public ButtonExit(Texture texture, ScreenController screenController) {
-        super(new TextureRegion(texture), screenController);
+    public ButtonExit(TextureAtlas atlas, ScreenController screenController) {
+        super(atlas.findRegion("exit"), screenController);
     }
 
     @Override

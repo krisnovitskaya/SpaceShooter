@@ -1,6 +1,8 @@
 package ru.geekbrains.screen;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 
 import ru.geekbrains.base.BaseScreen;
@@ -8,6 +10,7 @@ import ru.geekbrains.controller.ScreenController;
 import ru.geekbrains.math.Rect;
 import ru.geekbrains.sprite.Background;
 import ru.geekbrains.sprite.Logo;
+import ru.geekbrains.sprite.Starship;
 
 public class GameScreen extends BaseScreen {
 
@@ -15,8 +18,9 @@ public class GameScreen extends BaseScreen {
 
     private Texture bg;
     private Background background;
-    private Texture txLogo;
-    private Logo logo;
+    private TextureAtlas atlas;
+    private Starship starship;
+
 
 
 
@@ -25,25 +29,48 @@ public class GameScreen extends BaseScreen {
         super.show();
         bg = new Texture("background.jpg");
         background = new Background(bg, screenController);
-        txLogo = new Texture("star.png");
-        logo = new Logo(txLogo, screenController);
+        atlas = new TextureAtlas(Gdx.files.internal("mainAtlas.tpack"));
+        starship = new Starship(atlas, screenController);
+
     }
 
     @Override
     public void render(float delta) {
         super.render(delta);
+        update(delta);
+        draw();
+    }
+
+    private void update(float delta) {
+        starship.update(delta);
+    }
+
+    private void draw() {
         batch.begin();
         background.draw(batch);
-        logo.draw(batch);
-
-
+        starship.draw(batch);
         batch.end();
+    }
+
+
+    @Override
+    public void resize(int width, int height) {
+        super.resize(width, height);
+    }
+
+    @Override
+    public boolean keyDown(int keycode) {
+        return super.keyDown(keycode);
+    }
+
+    @Override
+    public boolean keyUp(int keycode) {
+        return super.keyUp(keycode);
     }
 
     @Override
     public boolean touchDown(Vector2 touch, int pointer, int button) {
-
-        logo.touchDown(touch, pointer, button);
+        starship.touchDown(touch, pointer, button);
         return super.touchDown(touch, pointer, button);
     }
 
@@ -55,15 +82,14 @@ public class GameScreen extends BaseScreen {
     @Override
     public void dispose() {
         bg.dispose();
-
-        txLogo.dispose();
+        atlas.dispose();
         super.dispose();
     }
 
     @Override
     public void resize(Rect worldBounds) {
         background.resize(worldBounds);
-        logo.resize(worldBounds);
+        starship.resize(worldBounds);
     }
 
     public ScreenController getScreenController() {
