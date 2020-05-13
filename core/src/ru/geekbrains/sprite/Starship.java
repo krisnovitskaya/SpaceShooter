@@ -15,6 +15,10 @@ public class Starship extends Sprite {
     private Vector2 temp;
     private Vector2 distance;
     private float speed;
+    private boolean left;
+    private boolean up;
+    private boolean down;
+    private boolean right;
 
 
     public Starship(TextureAtlas atlas, ScreenController screenController) {
@@ -25,6 +29,10 @@ public class Starship extends Sprite {
         this.temp = new Vector2();
         this.distance = new Vector2(this.pos);
         this.speed = 0.5f;
+        left = false;
+        up = false;
+        down = false;
+        right = false;
 
     }
 
@@ -46,6 +54,45 @@ public class Starship extends Sprite {
             pos.mulAdd(temp, delta);
         } else {
             pos.set(distance);
+            temp.setZero();
+        }
+
+        if (left) pos.x -= speed * delta;
+        if (up) pos.y += speed * delta;
+        if (down) pos.y -= speed * delta;
+        if (right) pos.x += speed * delta;
+
+    }
+
+    public void keyDown(int keycode) {
+        temp.setZero();
+        if(keycode == Input.Keys.A){
+            left = true;
+        }
+        if(keycode == Input.Keys.W){
+            up = true;
+        }
+        if(keycode == Input.Keys.S){
+            down = true;
+        }
+        if(keycode == Input.Keys.D){
+            right = true;
+        }
+    }
+
+    public void keyUp(int keycode) {
+        temp.setZero();
+        if(keycode == Input.Keys.A){
+            left = false;
+        }
+        if(keycode == Input.Keys.W){
+            up = false;
+        }
+        if(keycode == Input.Keys.S){
+            down = false;
+        }
+        if(keycode == Input.Keys.D){
+            right = false;
         }
     }
 }

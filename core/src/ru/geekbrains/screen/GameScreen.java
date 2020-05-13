@@ -1,6 +1,7 @@
 package ru.geekbrains.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
@@ -60,11 +61,17 @@ public class GameScreen extends BaseScreen {
 
     @Override
     public boolean keyDown(int keycode) {
+        if(keycode == Input.Keys.A || keycode == Input.Keys.W ||keycode == Input.Keys.S ||keycode == Input.Keys.D){
+            starship.keyDown(keycode);
+        }
         return super.keyDown(keycode);
     }
 
     @Override
     public boolean keyUp(int keycode) {
+        if(keycode == Input.Keys.A || keycode == Input.Keys.W ||keycode == Input.Keys.S ||keycode == Input.Keys.D){
+            starship.keyUp(keycode);
+        }
         return super.keyUp(keycode);
     }
 
