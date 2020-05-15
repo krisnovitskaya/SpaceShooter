@@ -29,9 +29,9 @@ public class GameScreen extends BaseScreen {
     public void show() {
         super.show();
         bg = new Texture("background.jpg");
-        background = new Background(bg, screenController);
+        background = new Background(bg);
         atlas = new TextureAtlas(Gdx.files.internal("mainAtlas.tpack"));
-        starship = new Starship(atlas, screenController);
+        starship = new Starship(atlas);
 
     }
 

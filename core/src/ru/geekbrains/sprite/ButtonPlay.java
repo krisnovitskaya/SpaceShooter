@@ -14,10 +14,11 @@ import ru.geekbrains.math.Rect;
 import ru.geekbrains.screen.GameScreen;
 
 public class ButtonPlay extends Sprite {
-
+    ScreenController screenController;
 
     public ButtonPlay(TextureAtlas atlas, ScreenController screenController) {
-        super(atlas.findRegion("play"), screenController);
+        super(atlas.findRegion("play"));
+        this.screenController = screenController;
     }
 
     @Override

@@ -13,12 +13,11 @@ public class Sprite extends Rect {
     protected float scale = 1f;
     protected TextureRegion[] regions;
     protected int frame = 0;
-    protected ScreenController screenController;
 
-    public Sprite(TextureRegion region, ScreenController screenController){
+
+    public Sprite(TextureRegion region){
         regions = new TextureRegion[1];
         regions[0] = region;
-        this.screenController = screenController;
     }
 
     public void setHeightProportion(float height){

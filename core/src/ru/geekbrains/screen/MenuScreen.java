@@ -35,13 +35,13 @@ public class MenuScreen extends BaseScreen {
     public void show() {
         super.show();
         bg = new Texture("background.jpg");
-        background = new Background(bg, screenController);
+        background = new Background(bg);
         atlas = new TextureAtlas(Gdx.files.internal("menu.pack"));
-        bExit = new ButtonExit(atlas, screenController);
+        bExit = new ButtonExit(atlas);
         bPlay = new ButtonPlay(atlas, screenController);
         stars = new Star[64];
         for (int i = 0; i < stars.length; i++) {
-            stars[i] = new Star(atlas, screenController);
+            stars[i] = new Star(atlas);
         }
 
     }

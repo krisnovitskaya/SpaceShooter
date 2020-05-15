@@ -23,8 +23,8 @@ public class Starship extends Sprite {
     private boolean right;
 
 
-    public Starship(TextureAtlas atlas, ScreenController screenController) {
-        super(atlas.findRegion("main_ship"), screenController);
+    public Starship(TextureAtlas atlas) {
+        super(atlas.findRegion("main_ship"));
         TextureRegion buf = atlas.findRegion("main_ship");
         TextureRegion[][] reg = buf.split(buf.getRegionWidth()/2, buf.getRegionHeight());
         worldBounds = new Rect();

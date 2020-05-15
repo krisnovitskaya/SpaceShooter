@@ -18,8 +18,8 @@ public class Star extends Sprite {
 
 
 
-    public Star(TextureAtlas atlas, ScreenController screenController) {
-        super(atlas.findRegion("star"), screenController);
+    public Star(TextureAtlas atlas) {
+        super(atlas.findRegion("star"));
         velocity = new Vector2();
         float vx = Rnd.nextFloat(-0.005f, 0.005f);
         float vy = Rnd.nextFloat(-0.01f, -0.005f);
