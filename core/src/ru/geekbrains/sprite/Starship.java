@@ -2,12 +2,12 @@ package ru.geekbrains.sprite;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
 import ru.geekbrains.base.Sprite;
-import ru.geekbrains.controller.ScreenController;
 import ru.geekbrains.math.Rect;
 import ru.geekbrains.pool.BulletPool;
 
@@ -32,6 +32,11 @@ public class Starship extends Sprite {
     private TextureRegion bulletRegion;
     private Vector2 bulletV;
 
+    private float shootTimer;
+    private float shootInterval;
+
+    private Sound sound;
+
     public Starship(TextureAtlas atlas, BulletPool bulletPool) {
         super(atlas.findRegion("main_ship"), 1, 2, 2);
         this.bulletPool = bulletPool;
@@ -41,6 +46,9 @@ public class Starship extends Sprite {
         v = new Vector2();
         leftPointer = INVALID_POINTER;
         rightPointer = INVALID_POINTER;
+        shootInterval = 0.2f; //неплохо бы прикрутить бонус, при получении которого скорость стрельбы увеличивается на какое-то время
+        sound = Gdx.audio.newSound(Gdx.files.internal("sound/bullet.wav"));
+
     }
 
     @Override
@@ -60,6 +68,15 @@ public class Starship extends Sprite {
         if (getRight() > worldBounds.getRight()) {
             stop();
             setRight(worldBounds.getRight());
+        }
+        autoshooting(delta);
+    }
+
+    private void autoshooting(float delta) {
+        shootTimer += delta;
+        if (shootTimer >= shootInterval) {
+            shoot();
+            shootTimer = 0f;
         }
     }
 
@@ -113,9 +130,9 @@ public class Starship extends Sprite {
                 pressedRight = true;
                 moveRight();
                 break;
-            case Input.Keys.UP:
-                shoot();
-                break;
+//            case Input.Keys.UP:
+//                shoot();
+//                break;
         }
         return false;
     }
@@ -159,5 +176,11 @@ public class Starship extends Sprite {
     private void shoot() {
         Bullet bullet = bulletPool.obtain();
         bullet.set(this, bulletRegion, pos, bulletV, 0.01f, worldBounds, 1);
+        sound.play(0.05f);
     }
+
+    public Sound getSound(){
+        return  this.sound;
+    }
+
 }

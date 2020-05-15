@@ -23,7 +23,7 @@ public class Star extends Sprite {
         super(atlas.findRegion("star"));
         velocity = new Vector2();
         float vx = Rnd.nextFloat(-0.005f, 0.005f);
-        float vy = Rnd.nextFloat(-0.01f, -0.005f);
+        float vy = Rnd.nextFloat(-0.1f, -0.05f);
         velocity.set(vx, vy);
         worldBounds = new Rect();
     }
@@ -32,7 +32,7 @@ public class Star extends Sprite {
         super(new TextureRegion(texture));
         velocity = new Vector2();
         float vx = Rnd.nextFloat(-0.005f, 0.005f);
-        float vy = Rnd.nextFloat(-0.01f, -0.005f);
+        float vy = Rnd.nextFloat(-0.1f, -0.05f);
         velocity.set(vx, vy);
         worldBounds = new Rect();
     }

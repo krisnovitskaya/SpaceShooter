@@ -16,12 +16,13 @@ public class BaseScreen implements Screen, InputProcessor {
     protected SpriteBatch batch;
 
     private Rect screenBounds;
+
     private Rect worldBounds;
+
     private Rect glBounds;
-
     private Matrix4 worldToGl;
-    private Matrix3 screenToWorld;
 
+    private Matrix3 screenToWorld;
     private Vector2 touch;
 
 
@@ -101,11 +102,11 @@ public class BaseScreen implements Screen, InputProcessor {
         touchDown(touch, pointer, button);
         return false;
     }
+
     public boolean touchDown(Vector2 touch, int pointer, int button) {
         //System.out.println("touchDown touch.x = " + touch.x + " touch.y = " + touch.y);
         return false;
     }
-
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         touch.set(screenX, screenBounds.getHeight() - screenY).mul(screenToWorld);
@@ -138,5 +139,9 @@ public class BaseScreen implements Screen, InputProcessor {
     @Override
     public boolean scrolled(int amount) {
         return false;
+    }
+
+    public Rect getWorldBounds() {
+        return worldBounds;
     }
 }
