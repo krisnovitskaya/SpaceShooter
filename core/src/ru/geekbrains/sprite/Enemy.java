@@ -23,9 +23,18 @@ public class Enemy extends Ship {
         }
     }
 
+    @Override
+    protected boolean checkStartPosition() {
+        if(this.getTop() > worldBounds.getTop()){
+            return true;
+        }
+        return false;
+    }
+
     public void set(
             TextureRegion[] regions,
-            Vector2 v0,
+//            Vector2 v0,
+            Vector2 v,
             TextureRegion bulletRegion,
             float bulletHeight,
             float bulletVY,
@@ -35,7 +44,8 @@ public class Enemy extends Ship {
             float height
     ) {
         this.regions = regions;
-        this.v0.set(v0);
+//        this.v0.set(v0);
+        this.v.set(v);
         this.bulletRegion = bulletRegion;
         this.bulletHeight = bulletHeight;
         this.bulletV.set(0, bulletVY);
@@ -44,37 +54,12 @@ public class Enemy extends Ship {
         this.reloadTimer = reloadInterval;
         this.hp = hp;
         setHeightProportion(height);
-        this.v.set(v0);
+        //this.v0.set(v);
     }
 
-//    private Vector2 velocity;
-//    private Rect worldBounds;
-//
-//    private Vector2 tempV = new Vector2();
-//    private Vector2 tempPos = new Vector2();
-//    private Vector2 temp = new Vector2();
+
 //    private final Vector2 Y = new Vector2(0, -0.5f);
-//
-//
-//    public Enemy(){
-//        regions = new TextureRegion[2];
-//        velocity = new Vector2();
-//    }
-//
-//    public void set(
-//            TextureRegion region,
-//            Vector2 pos0,
-//            Vector2 v0,
-//            float height,
-//            Rect worldBounds
-//    ) {
-//        this.regions = Regions.split(region, 1, 2, 2);
-//        this.pos.set(pos0);
-//        this.velocity.set(v0);
-//        setHeightProportion(height);
-//        this.worldBounds = worldBounds;
-//    }
-//
+
 //    @Override
 //    public void update(float delta) {
 //        tempPos.set(pos);
@@ -93,14 +78,12 @@ public class Enemy extends Ship {
 //        }
 //    }
 //
-//
 //    public Vector2 getNewPos(){
 //        float x = Rnd.nextFloat(-0.25f, 0.25f);
 //        float y = Rnd.nextFloat(0.44f, 0.4f);
 //        tempPos.set(x, y);
 //        return tempPos;
 //    }
-//
 //    public Vector2 getNewV(){
 //        float x = Rnd.nextFloat(-0.05f,0.05f);
 //        float y = Rnd.nextFloat(-0.1f, -0.05f);

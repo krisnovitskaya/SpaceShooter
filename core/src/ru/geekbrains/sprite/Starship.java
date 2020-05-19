@@ -160,4 +160,9 @@ public class Starship extends Ship {
         v.setZero();
     }
 
+    @Override
+    protected boolean checkStartPosition() {
+        return false;
+    }
+
 }

@@ -10,7 +10,7 @@ import ru.geekbrains.pool.ExplosionPool;
 import ru.geekbrains.sprite.Bullet;
 import ru.geekbrains.sprite.Explosion;
 
-public class Ship extends Sprite {
+public abstract class Ship extends Sprite {
 
     protected final Vector2 v0;
     protected final Vector2 v;
@@ -24,8 +24,8 @@ public class Ship extends Sprite {
     protected float bulletHeight;
     protected int damage;
 
-    protected float reloadInterval;
-    protected float reloadTimer;
+    protected float reloadInterval;//стрельба
+    protected float reloadTimer;//стрельба
 
     protected Sound sound;
 
@@ -55,14 +55,22 @@ public class Ship extends Sprite {
 
     @Override
     public void update(float delta) {
-        super.update(delta);
-        pos.mulAdd(v, delta);
+        //super.update(delta); зачем это вызывать?  если в спрайте метод пустой. и может стоит сделать класс Sprite абстрактным, да и все базовые классы абстрактными.
         reloadTimer += delta;
-        if (reloadTimer >= reloadInterval) {
-            shoot();
-            reloadTimer = 0f;
+        if(checkStartPosition()){
+            v0.set(v).scl(5f);
+            pos.mulAdd(v0, delta);
+        } else {
+            pos.mulAdd(v, delta);
+            if (reloadTimer >= reloadInterval) {
+                shoot();
+                reloadTimer = 0f;
+            }
         }
+
     }
+
+    protected abstract boolean checkStartPosition();
 
     @Override
     public void destroy() {
