@@ -18,7 +18,7 @@ public class Logo extends Sprite {
         super(new TextureRegion(texture),screenController);
         temp = new Vector2();
         distance = new Vector2(this.pos);
-        speed = 0.02f;
+        speed = 0.5f;
     }
 
     @Override
@@ -34,17 +34,19 @@ public class Logo extends Sprite {
         return super.touchDown(touch, pointer, button);
     }
 
-    private void upd() {
-        if(pos.dst(distance) > speed){
-            pos.add(temp);
+    @Override
+    public void update(float delta) {
+        if(pos.dst(distance) > speed * delta){
+            pos.mulAdd(temp, delta);
         } else {
             pos.set(distance);
         }
     }
 
+
+
     @Override
     public void draw(SpriteBatch batch) {
-        upd();
         super.draw(batch);
     }
 }

@@ -3,6 +3,7 @@ package ru.geekbrains.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 
 import ru.geekbrains.base.BaseScreen;
@@ -12,6 +13,7 @@ import ru.geekbrains.sprite.Background;
 import ru.geekbrains.sprite.ButtonExit;
 import ru.geekbrains.sprite.ButtonPlay;
 import ru.geekbrains.sprite.Logo;
+import ru.geekbrains.sprite.Star;
 
 //Адаптировать ДЗ 2 к новой архитектуре проекта.
 // Желательно всю логику которая касается обработки логотипа по максимуму разместить в классе Logo
@@ -23,12 +25,10 @@ public class MenuScreen extends BaseScreen {
     private ScreenController screenController;
     private Texture bg;
     private Background background;
-    private Texture txLogo;
-    private Logo logo;
-    private Texture exit;
+    private TextureAtlas atlas;
     private ButtonExit bExit;
-    private Texture play;
     private ButtonPlay bPlay;
+    private Star[] stars;
 
 
     @Override
@@ -36,32 +36,33 @@ public class MenuScreen extends BaseScreen {
         super.show();
         bg = new Texture("background.jpg");
         background = new Background(bg, screenController);
-        exit = new Texture("exit.jpg");
-        bExit = new ButtonExit(exit, screenController);
-        play = new Texture("play.jpg");
-        bPlay = new ButtonPlay(play, screenController);
-        txLogo = new Texture("star.png");
-        logo = new Logo(txLogo, screenController);
+        atlas = new TextureAtlas(Gdx.files.internal("menu.pack"));
+        bExit = new ButtonExit(atlas, screenController);
+        bPlay = new ButtonPlay(atlas, screenController);
+        stars = new Star[64];
+        for (int i = 0; i < stars.length; i++) {
+            stars[i] = new Star(atlas, screenController);
+        }
+
     }
 
     @Override
     public void render(float delta) {
         super.render(delta);
-//        update(delta);
-        batch.begin();
-        background.draw(batch);
-        logo.draw(batch);
-        bPlay.draw(batch);
-        bExit.draw(batch);
+        update(delta);
+        draw();
+    }
 
-        batch.end();
+    private void update(float delta) {
+        for (Star star : stars) {
+            star.update(delta);
+        }
     }
 
     @Override
     public boolean touchDown(Vector2 touch, int pointer, int button) {
         bPlay.touchDown(touch, pointer, button);
         bExit.touchDown(touch, pointer, button);
-//        logo.touchDown(touch, pointer, button);
         return super.touchDown(touch, pointer, button);
     }
 
@@ -75,9 +76,7 @@ public class MenuScreen extends BaseScreen {
     @Override
     public void dispose() {
         bg.dispose();
-        exit.dispose();
-        play.dispose();
-        txLogo.dispose();
+        atlas.dispose();
         super.dispose();
     }
 
@@ -86,7 +85,20 @@ public class MenuScreen extends BaseScreen {
         background.resize(worldBounds);
         bPlay.resize(worldBounds);
         bExit.resize(worldBounds);
-        logo.resize(worldBounds);
+        for (Star star : stars) {
+            star.resize(worldBounds);
+        }
+    }
+
+    private void draw() {
+        batch.begin();
+        background.draw(batch);
+        for (Star star : stars) {
+            star.draw(batch);
+        }
+        bPlay.draw(batch);
+        bExit.draw(batch);
+        batch.end();
     }
 
     public ScreenController getScreenController() {
