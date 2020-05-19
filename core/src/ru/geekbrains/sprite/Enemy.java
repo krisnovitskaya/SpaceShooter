@@ -18,9 +18,15 @@ public class Enemy extends Ship {
     @Override
     public void update(float delta) {
         super.update(delta);
-        if (getBottom() <= worldBounds.getBottom()) {
+        if(this.hp <= 0 || getBottom() <= worldBounds.getBottom()){
             destroy();
         }
+//        if (getBottom() <= worldBounds.getBottom()) {
+//            destroy();
+//        }
+    }
+    public void takeDamage(int damage){
+        this.hp -= damage;
     }
 
     @Override

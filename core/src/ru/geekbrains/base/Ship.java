@@ -24,6 +24,10 @@ public abstract class Ship extends Sprite {
     protected float bulletHeight;
     protected int damage;
 
+    public int getDamage() {
+        return damage;
+    }
+
     protected float reloadInterval;//стрельба
     protected float reloadTimer;//стрельба
 

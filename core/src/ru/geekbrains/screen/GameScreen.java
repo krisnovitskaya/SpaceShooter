@@ -16,6 +16,7 @@ import ru.geekbrains.pool.BulletPool;
 import ru.geekbrains.pool.EnemyPool;
 import ru.geekbrains.pool.ExplosionPool;
 import ru.geekbrains.sprite.Background;
+import ru.geekbrains.sprite.Bullet;
 import ru.geekbrains.sprite.Enemy;
 import ru.geekbrains.sprite.Logo;
 import ru.geekbrains.sprite.Star;
@@ -129,10 +130,24 @@ public class GameScreen extends BaseScreen {
         }
         bulletPool.updateActiveSprites(delta);
         enemyPool.updateActiveSprites(delta);
+        checkCollisions();
         explosionPool.updateActiveSprites(delta);
         starship.update(delta);
         enemyEmitter.generate(delta);
 
+    }
+
+    private void checkCollisions() {
+        for(Enemy enemy : enemyPool.getActiveObjects()){
+            for(Bullet bullet : bulletPool.getActiveObjects()){
+                if(enemy.isMe(bullet.pos)){
+                    if(bullet.getOwner() == starship){
+                        bullet.destroy();
+                        enemy.takeDamage(bullet.getDamage());
+                    }
+                }
+            }
+        }
     }
 
 
@@ -149,8 +164,8 @@ public class GameScreen extends BaseScreen {
             star.draw(batch);
         }
         bulletPool.drawActiveSprites(batch);
-        starship.draw(batch);
         enemyPool.drawActiveSprites(batch);
+        starship.draw(batch);
         explosionPool.drawActiveSprites(batch);
         batch.end();
     }
