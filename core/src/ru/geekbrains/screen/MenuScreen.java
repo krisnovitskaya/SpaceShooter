@@ -1,6 +1,7 @@
 package ru.geekbrains.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -29,20 +30,24 @@ public class MenuScreen extends BaseScreen {
     private ButtonExit bExit;
     private ButtonPlay bPlay;
     private Star[] stars;
+    private Music music;
 
 
     @Override
     public void show() {
         super.show();
         bg = new Texture("background.jpg");
-        background = new Background(bg, screenController);
+        background = new Background(bg);
         atlas = new TextureAtlas(Gdx.files.internal("menu.pack"));
-        bExit = new ButtonExit(atlas, screenController);
+        bExit = new ButtonExit(atlas);
         bPlay = new ButtonPlay(atlas, screenController);
         stars = new Star[64];
         for (int i = 0; i < stars.length; i++) {
-            stars[i] = new Star(atlas, screenController);
+            stars[i] = new Star(atlas);
         }
+        music = Gdx.audio.newMusic(Gdx.files.internal("sound/music.mp3"));
+        music.play();
+        music.setLooping(true);
 
     }
 
@@ -77,6 +82,7 @@ public class MenuScreen extends BaseScreen {
     public void dispose() {
         bg.dispose();
         atlas.dispose();
+        music.dispose();
         super.dispose();
     }
 

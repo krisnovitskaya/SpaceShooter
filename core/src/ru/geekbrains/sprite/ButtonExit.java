@@ -11,8 +11,8 @@ import ru.geekbrains.controller.ScreenController;
 import ru.geekbrains.math.Rect;
 
 public class ButtonExit extends Sprite {
-    public ButtonExit(TextureAtlas atlas, ScreenController screenController) {
-        super(atlas.findRegion("exit"), screenController);
+    public ButtonExit(TextureAtlas atlas) {
+        super(atlas.findRegion("exit"));
     }
 
     @Override
@@ -25,7 +25,7 @@ public class ButtonExit extends Sprite {
         if(isMe(touch)){
             setScale(1.2f);
         }
-        return super.touchDown(touch, pointer, button);
+        return false;
     }
 
     @Override
@@ -36,6 +36,6 @@ public class ButtonExit extends Sprite {
         if(isMe(touch)){
             Gdx.app.exit();
         }
-        return super.touchUp(touch, pointer, button);
+        return false;
     }
 }

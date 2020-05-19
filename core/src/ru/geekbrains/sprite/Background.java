@@ -8,8 +8,8 @@ import ru.geekbrains.controller.ScreenController;
 import ru.geekbrains.math.Rect;
 
 public class Background extends Sprite {
-    public Background(Texture texture, ScreenController screenController) {
-        super(new TextureRegion(texture), screenController);
+    public Background(Texture texture) {
+        super(new TextureRegion(texture));
     }
 
     @Override

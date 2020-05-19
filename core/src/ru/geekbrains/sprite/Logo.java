@@ -14,8 +14,8 @@ public class Logo extends Sprite {
     private Vector2 distance;
     private float speed;
 
-    public Logo(Texture texture, ScreenController screenController) {
-        super(new TextureRegion(texture),screenController);
+    public Logo(Texture texture) {
+        super(new TextureRegion(texture));
         temp = new Vector2();
         distance = new Vector2(this.pos);
         speed = 0.5f;
