@@ -14,11 +14,14 @@ import ru.geekbrains.math.Rect;
 import ru.geekbrains.math.Rnd;
 import ru.geekbrains.pool.BulletPool;
 import ru.geekbrains.pool.EnemyPool;
+import ru.geekbrains.pool.ExplosionPool;
 import ru.geekbrains.sprite.Background;
+import ru.geekbrains.sprite.Bullet;
 import ru.geekbrains.sprite.Enemy;
 import ru.geekbrains.sprite.Logo;
 import ru.geekbrains.sprite.Star;
 import ru.geekbrains.sprite.Starship;
+import ru.geekbrains.utils.EnemyEmitter;
 
 public class GameScreen extends BaseScreen {
 
@@ -32,15 +35,15 @@ public class GameScreen extends BaseScreen {
     private Texture starTexture;   //TO_DO создать пак со своей звездой и прочими текстурами игрового экрана
     private Star[] stars;
     private BulletPool bulletPool;
+    private EnemyPool enemyPool;
+    private ExplosionPool explosionPool;
     private Music music;
-
-    private EnemyPool enemies;
-    private float enemiesTimer;
-    private TextureRegion test1;
-    private Texture test;
+    private EnemyEmitter enemyEmitter;
 
 
-
+//    Сделать 2 режика корабля: когда он быстро вылетает на экран и когда начинает двигаться со своей скоростью и вести бой.
+//    Важно чтобы стрельба началась сразу после того как корабль полностью появится на экране (сейчас маленькие корабли стреляют в самом конце)
+//*Сделать проверку столкновения вражеского корабля с нашими пулями и уничтожение вражеского корабля
 
 
     @Override
@@ -55,15 +58,13 @@ public class GameScreen extends BaseScreen {
             stars[i] = new Star(starTexture);
         }
         bulletPool = new BulletPool();
-        starship = new Starship(atlas, bulletPool);
+        explosionPool = new ExplosionPool(atlas);
+        enemyPool = new EnemyPool(bulletPool, explosionPool, worldBounds);
+        starship = new Starship(atlas, bulletPool, explosionPool);
+        enemyEmitter = new EnemyEmitter(atlas, enemyPool);
         music = Gdx.audio.newMusic(Gdx.files.internal("sound/music.mp3"));
-        music.play();
         music.setLooping(true);
-
-        enemies = new EnemyPool();
-        enemiesTimer = Rnd.nextFloat(1f, 2f);;
-        test = new Texture("test.jpg");
-        test1 = new TextureRegion(test);
+        music.play();
 
 
     }
@@ -83,16 +84,19 @@ public class GameScreen extends BaseScreen {
             star.resize(worldBounds);
         }
         starship.resize(worldBounds);
+        enemyEmitter.resize(worldBounds);
     }
 
     @Override
     public void dispose() {
         bg.dispose();
         atlas.dispose();
+        starTexture.dispose();
         bulletPool.dispose();
-        enemies.dispose();
-        starship.getSound().dispose();
+        enemyPool.dispose();
+        explosionPool.dispose();
         music.dispose();
+        starship.dispose();
         super.dispose();
     }
 
@@ -125,23 +129,32 @@ public class GameScreen extends BaseScreen {
             star.update(delta);
         }
         bulletPool.updateActiveSprites(delta);
+        enemyPool.updateActiveSprites(delta);
+        checkCollisions();
+        explosionPool.updateActiveSprites(delta);
         starship.update(delta);
-        enemiesUpd(delta);
-        enemies.updateActiveSprites(delta);
+        enemyEmitter.generate(delta);
 
     }
-    private void enemiesUpd(float delta){
-        enemiesTimer -= delta;
-        if (enemiesTimer <= 0f) {
-            Enemy en = enemies.obtain();
-            en.set(atlas.findRegion("enemy1"), en.getNewPos(), en.getNewV(), 0.1f, this.getWorldBounds());
-            enemiesTimer = Rnd.nextFloat(0.5f, 3f);
+
+    private void checkCollisions() {
+        for(Enemy enemy : enemyPool.getActiveObjects()){
+            for(Bullet bullet : bulletPool.getActiveObjects()){
+                if(enemy.isMe(bullet.pos)){
+                    if(bullet.getOwner() == starship){
+                        bullet.destroy();
+                        enemy.takeDamage(bullet.getDamage());
+                    }
+                }
+            }
         }
     }
 
+
     private void free() {
         bulletPool.freeAllDestroyed();
-        enemies.freeAllDestroyed();
+        enemyPool.freeAllDestroyed();
+        explosionPool.freeAllDestroyed();
     }
 
     private void draw() {
@@ -151,8 +164,9 @@ public class GameScreen extends BaseScreen {
             star.draw(batch);
         }
         bulletPool.drawActiveSprites(batch);
-        enemies.drawActiveSprites(batch);
+        enemyPool.drawActiveSprites(batch);
         starship.draw(batch);
+        explosionPool.drawActiveSprites(batch);
         batch.end();
     }
 
