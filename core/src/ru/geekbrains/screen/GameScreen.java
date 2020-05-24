@@ -19,6 +19,7 @@ import ru.geekbrains.pool.EnemyPool;
 import ru.geekbrains.pool.ExplosionPool;
 import ru.geekbrains.sprite.Background;
 import ru.geekbrains.sprite.Bullet;
+import ru.geekbrains.sprite.ButtonNewGame;
 import ru.geekbrains.sprite.Enemy;
 import ru.geekbrains.sprite.GameOver;
 import ru.geekbrains.sprite.Logo;
@@ -29,8 +30,8 @@ import ru.geekbrains.utils.EnemyEmitter;
 public class GameScreen extends BaseScreen {
 
     private ScreenController screenController;
-    private enum State {PLAYING, GAME_OVER}
 
+    private enum State {PLAYING, GAME_OVER}
     private Texture bg;
     private Background background;
     private TextureAtlas atlas;
@@ -44,7 +45,7 @@ public class GameScreen extends BaseScreen {
     private EnemyEmitter enemyEmitter;
     private State state;
     private GameOver gameOver;
-
+    private ButtonNewGame bNewGame;
 
 
 
@@ -66,6 +67,7 @@ public class GameScreen extends BaseScreen {
         starship = new Starship(atlas, bulletPool, explosionPool);
         enemyEmitter = new EnemyEmitter(atlas, enemyPool);
         gameOver = new GameOver(atlas);
+        bNewGame = new ButtonNewGame(atlas, screenController, this);
         music = Gdx.audio.newMusic(Gdx.files.internal("sound/music.mp3"));
         music.setLooping(true);
         music.play();
@@ -91,6 +93,7 @@ public class GameScreen extends BaseScreen {
         starship.resize(worldBounds);
         enemyEmitter.resize(worldBounds);
         gameOver.resize(worldBounds);
+        bNewGame.resize(worldBounds);
     }
 
     @Override
@@ -127,6 +130,9 @@ public class GameScreen extends BaseScreen {
         if(state == State.PLAYING) {
             starship.touchDown(touch, pointer, button);
         }
+        if(state == State.GAME_OVER){
+            bNewGame.touchDown(touch, pointer, button);
+        }
         return false;
     }
 
@@ -134,6 +140,9 @@ public class GameScreen extends BaseScreen {
     public boolean touchUp(Vector2 touch, int pointer, int button) {
         if(state == State.PLAYING) {
             starship.touchUp(touch, pointer, button);
+        }
+        if(state == State.GAME_OVER){
+            bNewGame.touchUp(touch, pointer, button);
         }
         return false;
     }
@@ -208,6 +217,7 @@ public class GameScreen extends BaseScreen {
             enemyPool.drawActiveSprites(batch);
         } else if (state == State.GAME_OVER) {
             gameOver.draw(batch);
+            bNewGame.draw(batch);
         }
         explosionPool.drawActiveSprites(batch);
         batch.end();
@@ -215,6 +225,16 @@ public class GameScreen extends BaseScreen {
 
     public ScreenController getScreenController() {
         return screenController;
+    }
+
+    public void newGame() {
+        bulletPool = new BulletPool();
+        explosionPool = new ExplosionPool(atlas);
+        enemyPool = new EnemyPool(bulletPool, explosionPool, worldBounds);
+        starship = new Starship(atlas, bulletPool, explosionPool);
+        enemyEmitter = new EnemyEmitter(atlas, enemyPool);
+        this.resize(worldBounds);
+        state = State.PLAYING;
     }
 
     public void setScreenController(ScreenController screenController) {
