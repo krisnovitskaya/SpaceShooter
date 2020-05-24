@@ -10,7 +10,9 @@ import ru.geekbrains.pool.ExplosionPool;
 import ru.geekbrains.sprite.Bullet;
 import ru.geekbrains.sprite.Explosion;
 
-public abstract class Ship extends Sprite {
+public class Ship extends Sprite {
+
+    private static final float DAMAGE_ANIMATE_INTERVAL = 0.1f;
 
     protected final Vector2 v0;
     protected final Vector2 v;
@@ -21,24 +23,26 @@ public abstract class Ship extends Sprite {
     protected BulletPool bulletPool;
     protected TextureRegion bulletRegion;
     protected Vector2 bulletV;
+    protected Vector2 bulletPos;
     protected float bulletHeight;
     protected int damage;
 
-    public int getDamage() {
-        return damage;
-    }
-
-    protected float reloadInterval;//стрельба
-    protected float reloadTimer;//стрельба
+    protected float reloadInterval;
+    protected float reloadTimer;
 
     protected Sound sound;
 
     protected int hp;
 
+    private float damageAnimateTimer;
+
     public Ship(TextureRegion region, int rows, int cols, int frames) {
         super(region, rows, cols, frames);
         v0 = new Vector2();
         v = new Vector2();
+        bulletV = new Vector2();
+        bulletPos = new Vector2();
+        damageAnimateTimer = DAMAGE_ANIMATE_INTERVAL;
     }
 
     public Ship(BulletPool bulletPool, ExplosionPool explosionPool, Rect worldBounds, Sound sound) {
@@ -49,6 +53,8 @@ public abstract class Ship extends Sprite {
         v0 = new Vector2();
         v = new Vector2();
         bulletV = new Vector2();
+        bulletPos = new Vector2();
+        damageAnimateTimer = DAMAGE_ANIMATE_INTERVAL;
     }
 
     @Override
@@ -59,22 +65,13 @@ public abstract class Ship extends Sprite {
 
     @Override
     public void update(float delta) {
-        //super.update(delta); зачем это вызывать?  если в спрайте метод пустой. и может стоит сделать класс Sprite абстрактным, да и все базовые классы абстрактными.
-        reloadTimer += delta;
-        if(checkStartPosition()){
-            v0.set(v).scl(5f);
-            pos.mulAdd(v0, delta);
-        } else {
-            pos.mulAdd(v, delta);
-            if (reloadTimer >= reloadInterval) {
-                shoot();
-                reloadTimer = 0f;
-            }
+        super.update(delta);
+        pos.mulAdd(v, delta);
+        damageAnimateTimer += delta;
+        if (damageAnimateTimer >= DAMAGE_ANIMATE_INTERVAL) {
+            frame = 0;
         }
-
     }
-
-    protected abstract boolean checkStartPosition();
 
     @Override
     public void destroy() {
@@ -82,9 +79,31 @@ public abstract class Ship extends Sprite {
         boom();
     }
 
+    public void damage(int damage) {
+        damageAnimateTimer = 0f;
+        frame = 1;
+        hp -= damage;
+        if (hp <= 0) {
+            hp = 0;
+            destroy();
+        }
+    }
+
+    public int getDamage() {
+        return damage;
+    }
+
+    protected void autoShoot(float delta) {
+        reloadTimer += delta;
+        if (reloadTimer >= reloadInterval) {
+            shoot();
+            reloadTimer = 0f;
+        }
+    }
+
     protected void shoot() {
         Bullet bullet = bulletPool.obtain();
-        bullet.set(this, bulletRegion, pos, bulletV, bulletHeight, worldBounds, damage);
+        bullet.set(this, bulletRegion, bulletPos, bulletV, bulletHeight, worldBounds, damage);
         sound.play();
     }
 
