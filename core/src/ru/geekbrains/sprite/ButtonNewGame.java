@@ -13,6 +13,10 @@ public class ButtonNewGame extends ScaledButton {
     private GameScreen gameScreen;
     private static final float MARGIN = 0.05f;
 
+    private static final float ANIMATE_INTERVAL = 1f;
+    private float animateTimer;
+    private boolean scaleUp = true;
+
     public ButtonNewGame(TextureAtlas atlas, ScreenController screenController, GameScreen gameScreen) {
         super(atlas.findRegion("button_new_game"));
         this.screenController = screenController;
@@ -28,6 +32,20 @@ public class ButtonNewGame extends ScaledButton {
     @Override
     public void action() {
 //        screenController.setMenuScreen(); //вариант с переходом в меню
-        gameScreen.newGame();
+        gameScreen.startNewGame();
+    }
+
+    @Override
+    public void update(float delta) {
+        animateTimer += delta;
+        if (animateTimer >= ANIMATE_INTERVAL) {
+            animateTimer = 0f;
+            scaleUp = !scaleUp;
+        }
+        if (scaleUp) {
+            setScale(getScale() + 0.003f);
+        } else {
+            setScale(getScale() - 0.003f);
+        }
     }
 }

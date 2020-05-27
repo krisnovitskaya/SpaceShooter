@@ -93,6 +93,10 @@ public class Ship extends Sprite {
         return damage;
     }
 
+    public int getHp() {
+        return hp;
+    }
+
     protected void autoShoot(float delta) {
         reloadTimer += delta;
         if (reloadTimer >= reloadInterval) {
