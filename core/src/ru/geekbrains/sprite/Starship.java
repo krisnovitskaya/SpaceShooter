@@ -19,6 +19,7 @@ public class Starship extends Ship {
     private static final float MARGIN = 0.05f;
     private static final int INVALID_POINTER = -1;
     private static final int HP_MAX = 10;
+    private static final int CLEAN_LEVEL_MAX = 3;
 
     private int leftPointer;
     private int rightPointer;
@@ -26,11 +27,20 @@ public class Starship extends Ship {
     private boolean pressedLeft;
     private boolean pressedRight;
 
+    private int level;
+    private int cleanLevelCounter;
+
+    @Override
+    public void damage(int damage) {
+        super.damage(damage);
+        cleanLevelCounter = 0;
+    }
+
     public Starship(TextureAtlas atlas, BulletPool bulletPool, ExplosionPool explosionPool) {
-        super(atlas.findRegion("main_ship"), 1, 2, 2);
+        super(atlas.findRegion("starship2"), 1, 3, 3);
         this.bulletPool = bulletPool;
         this.explosionPool = explosionPool;
-        bulletRegion = atlas.findRegion("bulletMainShip");
+        bulletRegion = atlas.findRegion("bulletStarship");
         bulletV = new Vector2(0, 0.5f);
         bulletHeight = 0.01f;
         damage = 1;
@@ -50,6 +60,8 @@ public class Starship extends Ship {
         rightPointer = INVALID_POINTER;
         pressedLeft = false;
         pressedRight = false;
+        cleanLevelCounter = 0;
+        level = 1;
         stop();
         this.pos.x = 0;
         flushDestroy();
@@ -74,6 +86,9 @@ public class Starship extends Ship {
         if (getRight() > worldBounds.getRight()) {
             stop();
             setRight(worldBounds.getRight());
+        }
+        if (cleanLevelCounter >= CLEAN_LEVEL_MAX) {
+            frame = 2;
         }
     }
 
@@ -184,5 +199,13 @@ public class Starship extends Ship {
 
     public int getHpMax() {
         return HP_MAX;
+    }
+
+    public void checkImba(int frags) {
+        int temp = frags / 10 + 1;
+        if (temp > level) {
+            level = temp;
+            cleanLevelCounter++;
+        }
     }
 }

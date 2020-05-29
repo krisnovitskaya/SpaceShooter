@@ -1,6 +1,7 @@
 package ru.geekbrains.sprite;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import ru.geekbrains.base.Sprite;
@@ -9,9 +10,9 @@ import ru.geekbrains.math.Rect;
 public class HPline extends Sprite {
     private Starship myShip;
 
-    public HPline(Texture texture, Starship myShip) {
-        super(new TextureRegion(texture));
-         this.myShip = myShip;
+    public HPline(TextureAtlas atlas, Starship myShip) {
+        super(atlas.findRegion("hp"));
+        this.myShip = myShip;
     }
 
     @Override

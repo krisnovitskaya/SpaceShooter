@@ -41,7 +41,6 @@ public class GameScreen extends BaseScreen {
     private Background background;
     private TextureAtlas atlas;
     private Starship starship;
-    private Texture starTexture;
     private Star[] stars;
     private BulletPool bulletPool;
     private EnemyPool enemyPool;
@@ -56,7 +55,6 @@ public class GameScreen extends BaseScreen {
     private StringBuilder sbFrags;
     private StringBuilder sbHp;
     private StringBuilder sbLevel;
-    private Texture hpLineTexture;
     private HPline hPline;
 
 
@@ -67,20 +65,16 @@ public class GameScreen extends BaseScreen {
         super.show();
         bg = new Texture("background.jpg");
         background = new Background(bg);
-        atlas = new TextureAtlas("mainAtlas.tpack");
-        starTexture = new Texture("star.png");
+        atlas = new TextureAtlas("texture/gameatlas.pack");
         stars = new Star[32];
         for (int i = 0; i < stars.length; i++) {
-            stars[i] = new Star(starTexture);
+            stars[i] = new Star(atlas);
         }
         bulletPool = new BulletPool();
         explosionPool = new ExplosionPool(atlas);
         enemyPool = new EnemyPool(bulletPool, explosionPool, worldBounds);
         starship = new Starship(atlas, bulletPool, explosionPool);
-
-        hpLineTexture = new Texture("hp.png");
-        hPline = new HPline(hpLineTexture, starship);
-
+        hPline = new HPline(atlas, starship);
         enemyEmitter = new EnemyEmitter(atlas, enemyPool);
         gameOver = new GameOver(atlas);
         bNewGame = new ButtonNewGame(atlas, screenController, this);
@@ -121,16 +115,12 @@ public class GameScreen extends BaseScreen {
     public void dispose() {
         bg.dispose();
         atlas.dispose();
-        starTexture.dispose();
         bulletPool.dispose();
         enemyPool.dispose();
         explosionPool.dispose();
         music.dispose();
         starship.dispose();
         font.dispose();
-
-        hpLineTexture.dispose();
-
         super.dispose();
     }
 
@@ -236,6 +226,7 @@ public class GameScreen extends BaseScreen {
         if (starship.isDestroyed()) {
             state = State.GAME_OVER;
         }
+        starship.checkImba(frags);
     }
 
 
