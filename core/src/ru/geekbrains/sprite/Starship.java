@@ -41,6 +41,18 @@ public class Starship extends Ship {
         reloadTimer = reloadInterval;
         hp = HP;
         sound = Gdx.audio.newSound(Gdx.files.internal("sound/laser.wav"));
+        startNewGame();
+    }
+
+    public void startNewGame() {
+        hp = HP;
+        leftPointer = INVALID_POINTER;
+        rightPointer = INVALID_POINTER;
+        pressedLeft = false;
+        pressedRight = false;
+        stop();
+        this.pos.x = 0;
+        flushDestroy();
     }
 
     @Override

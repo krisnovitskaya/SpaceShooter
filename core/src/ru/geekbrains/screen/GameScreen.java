@@ -7,10 +7,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Align;
 
 import java.util.List;
 
 import ru.geekbrains.base.BaseScreen;
+import ru.geekbrains.base.Font;
 import ru.geekbrains.controller.ScreenController;
 import ru.geekbrains.math.Rect;
 import ru.geekbrains.math.Rnd;
@@ -31,6 +33,12 @@ public class GameScreen extends BaseScreen {
 
     private ScreenController screenController;
 
+    private static final float TEXT_MARGIN = 0.01f;
+    private static final float FONT_SIZE = 0.02f;
+    private static final String FRAGS = "Frags: ";
+    private static final String HP = "HP: ";
+    private static final String LEVEL = "Level: ";
+
     private enum State {PLAYING, GAME_OVER}
     private Texture bg;
     private Background background;
@@ -46,6 +54,11 @@ public class GameScreen extends BaseScreen {
     private State state;
     private GameOver gameOver;
     private ButtonNewGame bNewGame;
+    private int frags;
+    private Font font;
+    private StringBuilder sbFrags;
+    private StringBuilder sbHp;
+    private StringBuilder sbLevel;
 
 
 
@@ -68,6 +81,10 @@ public class GameScreen extends BaseScreen {
         enemyEmitter = new EnemyEmitter(atlas, enemyPool);
         gameOver = new GameOver(atlas);
         bNewGame = new ButtonNewGame(atlas, screenController, this);
+        font = new Font("font/font.fnt", "font/font.png");
+        sbFrags = new StringBuilder();
+        sbHp = new StringBuilder();
+        sbLevel = new StringBuilder();
         music = Gdx.audio.newMusic(Gdx.files.internal("sound/music.mp3"));
         music.setLooping(true);
         music.play();
@@ -94,6 +111,7 @@ public class GameScreen extends BaseScreen {
         enemyEmitter.resize(worldBounds);
         gameOver.resize(worldBounds);
         bNewGame.resize(worldBounds);
+        font.setSize(FONT_SIZE);
     }
 
     @Override
@@ -106,6 +124,7 @@ public class GameScreen extends BaseScreen {
         explosionPool.dispose();
         music.dispose();
         starship.dispose();
+        font.dispose();
         super.dispose();
     }
 
@@ -147,6 +166,15 @@ public class GameScreen extends BaseScreen {
         return false;
     }
 
+    public void startNewGame() {
+        frags = 0;
+        starship.startNewGame();
+        bulletPool.freeAllActiveObjects();
+        explosionPool.freeAllActiveObjects();
+        enemyPool.freeAllActiveObjects();
+        state = State.PLAYING;
+    }
+
     private void update(float delta) {
         for (Star star : stars) {
             star.update(delta);
@@ -156,7 +184,9 @@ public class GameScreen extends BaseScreen {
             starship.update(delta);
             bulletPool.updateActiveSprites(delta);
             enemyPool.updateActiveSprites(delta);
-            enemyEmitter.generate(delta);
+            enemyEmitter.generate(delta, frags);
+        } else if (state == State.GAME_OVER) {
+            bNewGame.update(delta);
         }
 
     }
@@ -181,6 +211,9 @@ public class GameScreen extends BaseScreen {
                 if (enemy.isBulletCollision(bullet)) {
                     enemy.damage(bullet.getDamage());
                     bullet.destroy();
+                    if (enemy.isDestroyed()) {
+                        frags += 1;
+                    }
                 }
             }
         }
@@ -220,22 +253,24 @@ public class GameScreen extends BaseScreen {
             bNewGame.draw(batch);
         }
         explosionPool.drawActiveSprites(batch);
+        printInfo();
         batch.end();
     }
 
+    private void printInfo() {
+        sbFrags.setLength(0);
+        sbHp.setLength(0);
+        sbLevel.setLength(0);
+        font.draw(batch, sbFrags.append(FRAGS).append(frags), worldBounds.getLeft() + TEXT_MARGIN, worldBounds.getTop() - TEXT_MARGIN);
+        font.draw(batch, sbHp.append(HP).append(starship.getHp()), worldBounds.pos.x, worldBounds.getTop() - TEXT_MARGIN, Align.center);
+        font.draw(batch, sbHp, starship.pos.x, starship.getBottom() - TEXT_MARGIN, Align.center);
+        font.draw(batch, sbLevel.append(LEVEL).append(enemyEmitter.getLevel()), worldBounds.getRight() - TEXT_MARGIN, worldBounds.getTop() - TEXT_MARGIN, Align.right);
+    }
     public ScreenController getScreenController() {
         return screenController;
     }
 
-    public void newGame() {
-        bulletPool = new BulletPool();
-        explosionPool = new ExplosionPool(atlas);
-        enemyPool = new EnemyPool(bulletPool, explosionPool, worldBounds);
-        starship = new Starship(atlas, bulletPool, explosionPool);
-        enemyEmitter = new EnemyEmitter(atlas, enemyPool);
-        this.resize(worldBounds);
-        state = State.PLAYING;
-    }
+
 
     public void setScreenController(ScreenController screenController) {
         this.screenController = screenController;
