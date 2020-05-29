@@ -1,11 +1,9 @@
 package ru.geekbrains.screen;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
 
@@ -15,7 +13,6 @@ import ru.geekbrains.base.BaseScreen;
 import ru.geekbrains.base.Font;
 import ru.geekbrains.controller.ScreenController;
 import ru.geekbrains.math.Rect;
-import ru.geekbrains.math.Rnd;
 import ru.geekbrains.pool.BulletPool;
 import ru.geekbrains.pool.EnemyPool;
 import ru.geekbrains.pool.ExplosionPool;
@@ -24,7 +21,7 @@ import ru.geekbrains.sprite.Bullet;
 import ru.geekbrains.sprite.ButtonNewGame;
 import ru.geekbrains.sprite.Enemy;
 import ru.geekbrains.sprite.GameOver;
-import ru.geekbrains.sprite.Logo;
+import ru.geekbrains.sprite.HPline;
 import ru.geekbrains.sprite.Star;
 import ru.geekbrains.sprite.Starship;
 import ru.geekbrains.utils.EnemyEmitter;
@@ -59,6 +56,8 @@ public class GameScreen extends BaseScreen {
     private StringBuilder sbFrags;
     private StringBuilder sbHp;
     private StringBuilder sbLevel;
+    private Texture hpLineTexture;
+    private HPline hPline;
 
 
 
@@ -78,6 +77,10 @@ public class GameScreen extends BaseScreen {
         explosionPool = new ExplosionPool(atlas);
         enemyPool = new EnemyPool(bulletPool, explosionPool, worldBounds);
         starship = new Starship(atlas, bulletPool, explosionPool);
+
+        hpLineTexture = new Texture("hp.png");
+        hPline = new HPline(hpLineTexture, starship);
+
         enemyEmitter = new EnemyEmitter(atlas, enemyPool);
         gameOver = new GameOver(atlas);
         bNewGame = new ButtonNewGame(atlas, screenController, this);
@@ -89,7 +92,6 @@ public class GameScreen extends BaseScreen {
         music.setLooping(true);
         music.play();
         state = State.PLAYING;
-
     }
 
     @Override
@@ -108,6 +110,7 @@ public class GameScreen extends BaseScreen {
             star.resize(worldBounds);
         }
         starship.resize(worldBounds);
+        hPline.resize(worldBounds);
         enemyEmitter.resize(worldBounds);
         gameOver.resize(worldBounds);
         bNewGame.resize(worldBounds);
@@ -125,6 +128,9 @@ public class GameScreen extends BaseScreen {
         music.dispose();
         starship.dispose();
         font.dispose();
+
+        hpLineTexture.dispose();
+
         super.dispose();
     }
 
@@ -182,6 +188,7 @@ public class GameScreen extends BaseScreen {
         explosionPool.updateActiveSprites(delta);
         if(state == State.PLAYING) {
             starship.update(delta);
+            hPline.update(delta);
             bulletPool.updateActiveSprites(delta);
             enemyPool.updateActiveSprites(delta);
             enemyEmitter.generate(delta, frags);
@@ -246,8 +253,11 @@ public class GameScreen extends BaseScreen {
         }
         if (state == State.PLAYING) {
             starship.draw(batch);
+            hPline.draw(batch);
+
             bulletPool.drawActiveSprites(batch);
             enemyPool.drawActiveSprites(batch);
+
         } else if (state == State.GAME_OVER) {
             gameOver.draw(batch);
             bNewGame.draw(batch);
@@ -263,13 +273,11 @@ public class GameScreen extends BaseScreen {
         sbLevel.setLength(0);
         font.draw(batch, sbFrags.append(FRAGS).append(frags), worldBounds.getLeft() + TEXT_MARGIN, worldBounds.getTop() - TEXT_MARGIN);
         font.draw(batch, sbHp.append(HP).append(starship.getHp()), worldBounds.pos.x, worldBounds.getTop() - TEXT_MARGIN, Align.center);
-        font.draw(batch, sbHp, starship.pos.x, starship.getBottom() - TEXT_MARGIN, Align.center);
         font.draw(batch, sbLevel.append(LEVEL).append(enemyEmitter.getLevel()), worldBounds.getRight() - TEXT_MARGIN, worldBounds.getTop() - TEXT_MARGIN, Align.right);
     }
     public ScreenController getScreenController() {
         return screenController;
     }
-
 
 
     public void setScreenController(ScreenController screenController) {

@@ -18,7 +18,7 @@ public class Starship extends Ship {
     private static final float SIZE = 0.15f;
     private static final float MARGIN = 0.05f;
     private static final int INVALID_POINTER = -1;
-    private static final int HP = 10;
+    private static final int HP_MAX = 10;
 
     private int leftPointer;
     private int rightPointer;
@@ -39,13 +39,13 @@ public class Starship extends Ship {
         rightPointer = INVALID_POINTER;
         reloadInterval = 0.25f;
         reloadTimer = reloadInterval;
-        hp = HP;
+        hp = HP_MAX;
         sound = Gdx.audio.newSound(Gdx.files.internal("sound/laser.wav"));
         startNewGame();
     }
 
     public void startNewGame() {
-        hp = HP;
+        hp = HP_MAX;
         leftPointer = INVALID_POINTER;
         rightPointer = INVALID_POINTER;
         pressedLeft = false;
@@ -180,5 +180,9 @@ public class Starship extends Ship {
 
     private void stop() {
         v.setZero();
+    }
+
+    public int getHpMax() {
+        return HP_MAX;
     }
 }
