@@ -3,6 +3,7 @@ package ru.geekbrains.sprite;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -12,13 +13,14 @@ import ru.geekbrains.base.Sprite;
 import ru.geekbrains.math.Rect;
 import ru.geekbrains.pool.BulletPool;
 import ru.geekbrains.pool.ExplosionPool;
+import ru.geekbrains.utils.BonusType;
 
 public class Starship extends Ship {
 
     private static final float SIZE = 0.15f;
     private static final float MARGIN = 0.05f;
     private static final int INVALID_POINTER = -1;
-    private static final int HP_MAX = 10;
+    private static final int HP_MAX = 100;
     private static final int CLEAN_LEVEL_MAX = 3;
 
     private int leftPointer;
@@ -29,11 +31,22 @@ public class Starship extends Ship {
 
     private int level;
     private int cleanLevelCounter;
+    private BonusType bonusType;
+    private final int BONUS_HP = 20;
+    private final float BONUS_TIME = 10f;
+    private final float RELOAD_INTERVAL = 0.25f;
+    private final float BONUS_RELOAD_INTERVAL = RELOAD_INTERVAL * 0.3f;
+    private float bonusTimer;
+    private Shield shield;
+
+    private Vector2 temp;
 
     @Override
     public void damage(int damage) {
-        super.damage(damage);
-        cleanLevelCounter = 0;
+        if (bonusType != BonusType.SHIELD) {
+            super.damage(damage);
+            cleanLevelCounter = 0;
+        }
     }
 
     public Starship(TextureAtlas atlas, BulletPool bulletPool, ExplosionPool explosionPool) {
@@ -47,10 +60,11 @@ public class Starship extends Ship {
         v0.set(0.5f, 0);
         leftPointer = INVALID_POINTER;
         rightPointer = INVALID_POINTER;
-        reloadInterval = 0.25f;
+        reloadInterval = RELOAD_INTERVAL;
         reloadTimer = reloadInterval;
         hp = HP_MAX;
         sound = Gdx.audio.newSound(Gdx.files.internal("sound/laser.wav"));
+        shield = new Shield(atlas, BONUS_TIME);
         startNewGame();
     }
 
@@ -64,6 +78,8 @@ public class Starship extends Ship {
         level = 1;
         stop();
         this.pos.x = 0;
+        bonusType = BonusType.NONE;
+        temp = new Vector2();
         flushDestroy();
     }
 
@@ -72,11 +88,15 @@ public class Starship extends Ship {
         super.resize(worldBounds);
         setHeightProportion(SIZE);
         setBottom(worldBounds.getBottom() + MARGIN);
+        shield.resize(worldBounds, getHeight());
     }
 
     @Override
     public void update(float delta) {
         super.update(delta);
+        if (bonusType == BonusType.SPEED || bonusType == BonusType.SHIELD || bonusType == BonusType.SHOOT) {
+            bonusCheckAndUpdate(delta);
+        }
         bulletPos.set(pos.x, pos.y + getHalfHeight());
         autoShoot(delta);
         if (getLeft() < worldBounds.getLeft()) {
@@ -89,6 +109,42 @@ public class Starship extends Ship {
         }
         if (cleanLevelCounter >= CLEAN_LEVEL_MAX) {
             frame = 2;
+        }
+
+    }
+
+    private void bonusCheckAndUpdate(float delta) {
+        switch (bonusType) {
+            case SPEED:
+                this.reloadInterval = BONUS_RELOAD_INTERVAL;
+                break;
+            case SHIELD:
+                shield.pos.set(this.pos);
+                this.reloadInterval = RELOAD_INTERVAL;
+                break;
+            case SHOOT:
+                this.reloadInterval = RELOAD_INTERVAL;
+        }
+        bonusTimer -= delta;
+        if (bonusTimer <= 0) {
+            this.bonusType = BonusType.NONE;
+            this.reloadInterval = RELOAD_INTERVAL;
+        }
+    }
+
+    @Override
+    protected void shoot() {
+        super.shoot();
+        if (bonusType == BonusType.SHOOT) {
+            Bullet bullet = bulletPool.obtain();
+            bullet.set(this, bulletRegion, bulletPos, bulletV, bulletHeight, worldBounds, damage);
+            Bullet bullet2 = bulletPool.obtain();
+            bulletPos.set(pos.x + getHalfWidth(), pos.y + getHalfHeight());
+            bullet2.set(this, bulletRegion, bulletPos, bulletV, bulletHeight, worldBounds, damage);
+            Bullet bullet3 = bulletPool.obtain();
+            bulletPos.set(pos.x - getHalfWidth(), pos.y + getHalfHeight());
+            bullet3.set(this, bulletRegion, bulletPos, bulletV, bulletHeight, worldBounds, damage);
+            sound.play();
         }
     }
 
@@ -206,6 +262,26 @@ public class Starship extends Ship {
         if (temp > level) {
             level = temp;
             cleanLevelCounter++;
+        }
+    }
+
+    public void bonusActivate(BonusType bonusType) {
+        if (bonusType == BonusType.HP) {
+            hp += BONUS_HP;
+            if (hp > HP_MAX) {
+                hp = HP_MAX;
+            }
+        } else {
+            this.bonusType = bonusType;
+            bonusTimer = BONUS_TIME;
+        }
+    }
+
+    @Override
+    public void draw(SpriteBatch batch) {
+        super.draw(batch);
+        if (bonusType == BonusType.SHIELD) {
+            shield.draw(batch);
         }
     }
 }
