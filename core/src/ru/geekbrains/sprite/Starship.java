@@ -142,7 +142,7 @@ public class Starship extends Ship {
             Bullet bullet3 = bulletPool.obtain();
             bulletPos.set(pos.x - getHalfWidth(), pos.y + getHalfHeight());
             bullet3.set(this, bulletRegion, bulletPos, bulletV, bulletHeight, worldBounds, damage);
-            sound.play();
+            sound.play(volumeSound);
         }
     }
 

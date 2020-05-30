@@ -12,6 +12,7 @@ public class Explosion extends Sprite {
 
     private float animateTimer;
     private Sound sound;
+    private static float volumeSound;
 
     public Explosion(TextureAtlas atlas, Sound sound) {
         super(atlas.findRegion("explosion"), 9, 9, 74);
@@ -21,7 +22,7 @@ public class Explosion extends Sprite {
     public void set(float height, Vector2 pos) {
         setHeightProportion(height);
         this.pos.set(pos);
-        sound.play();
+        sound.play(volumeSound);
         frame = 0;
     }
 
@@ -40,5 +41,13 @@ public class Explosion extends Sprite {
     public void destroy() {
         super.destroy();
         frame = 0;
+    }
+
+    public static void setMute(int frame) {
+        if (frame == 1) {
+            volumeSound = 0.0f;
+        } else {
+            volumeSound = 1f;
+        }
     }
 }

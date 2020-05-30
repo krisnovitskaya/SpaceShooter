@@ -9,7 +9,6 @@ import ru.geekbrains.screen.GameScreen;
 import ru.geekbrains.screen.MenuScreen;
 
 public class ButtonNewGame extends ScaledButton {
-    private ScreenController screenController;
     private GameScreen gameScreen;
     private static final float MARGIN = 0.05f;
 
@@ -17,9 +16,9 @@ public class ButtonNewGame extends ScaledButton {
     private float animateTimer;
     private boolean scaleUp = true;
 
-    public ButtonNewGame(TextureAtlas atlas, ScreenController screenController, GameScreen gameScreen) {
+    public ButtonNewGame(TextureAtlas atlas, GameScreen gameScreen) {
         super(atlas.findRegion("button_new_game"));
-        this.screenController = screenController;
+
         this.gameScreen = gameScreen;
     }
 
@@ -31,7 +30,6 @@ public class ButtonNewGame extends ScaledButton {
 
     @Override
     public void action() {
-//        screenController.setMenuScreen(); //вариант с переходом в меню
         gameScreen.startNewGame();
     }
 

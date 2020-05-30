@@ -5,58 +5,72 @@ filter: Nearest,Nearest
 repeat: none
 explosion
   rotate: false
-  xy: 1, 83
+  xy: 1, 103
   size: 900, 900
   orig: 900, 900
   offset: 0, 0
   index: -1
-message_game_over
+music_button
   rotate: false
-  xy: 1, 13
-  size: 493, 68
-  orig: 493, 68
+  xy: 1, 1
+  size: 200, 100
+  orig: 200, 100
   offset: 0, 0
   index: -1
-button_new_game
+sound_button
   rotate: false
-  xy: 496, 25
-  size: 365, 56
-  orig: 365, 56
+  xy: 203, 1
+  size: 200, 100
+  orig: 200, 100
   offset: 0, 0
   index: -1
-star
+menu
   rotate: false
-  xy: 903, 883
+  xy: 405, 1
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
-hp
+star
   rotate: false
-  xy: 1, 1
-  size: 80, 10
-  orig: 80, 10
+  xy: 507, 1
+  size: 100, 100
+  orig: 100, 100
+  offset: 0, 0
+  index: -1
+button_new_game
+  rotate: false
+  xy: 609, 45
+  size: 365, 56
+  orig: 365, 56
   offset: 0, 0
   index: -1
 bulletEnemy
   rotate: false
-  xy: 863, 65
+  xy: 609, 27
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 bulletStarship
   rotate: false
-  xy: 903, 865
+  xy: 627, 27
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 bulletStarship2
   rotate: false
-  xy: 1005, 967
+  xy: 645, 27
   size: 16, 16
   orig: 16, 16
+  offset: 0, 0
+  index: -1
+hp
+  rotate: false
+  xy: 663, 33
+  size: 80, 10
+  orig: 80, 10
   offset: 0, 0
   index: -1
 
@@ -64,60 +78,46 @@ gameatlas2.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-hpup
+enemy2
   rotate: false
-  xy: 1, 780
-  size: 380, 186
-  orig: 380, 186
-  offset: 0, 0
-  index: -1
-shieldup
-  rotate: false
-  xy: 383, 780
-  size: 380, 186
-  orig: 380, 186
-  offset: 0, 0
-  index: -1
-shootup
-  rotate: false
-  xy: 1, 592
-  size: 380, 186
-  orig: 380, 186
-  offset: 0, 0
-  index: -1
-speedup
-  rotate: false
-  xy: 383, 592
-  size: 380, 186
-  orig: 380, 186
-  offset: 0, 0
-  index: -1
-enemy1
-  rotate: false
-  xy: 1, 342
-  size: 440, 248
-  orig: 440, 248
-  offset: 0, 0
-  index: -1
-shield
-  rotate: false
-  xy: 443, 290
-  size: 314, 300
-  orig: 314, 300
+  xy: 1, 684
+  size: 784, 338
+  orig: 784, 338
   offset: 0, 0
   index: -1
 enemy0
   rotate: false
-  xy: 1, 31
+  xy: 1, 373
   size: 332, 309
   orig: 332, 309
   offset: 0, 0
   index: -1
+shield
+  rotate: false
+  xy: 1, 71
+  size: 314, 300
+  orig: 314, 300
+  offset: 0, 0
+  index: -1
+message_game_over
+  rotate: false
+  xy: 1, 1
+  size: 493, 68
+  orig: 493, 68
+  offset: 0, 0
+  index: -1
 starship2
   rotate: false
-  xy: 335, 1
+  xy: 317, 84
   size: 585, 287
   orig: 585, 287
+  offset: 0, 0
+  index: -1
+enemy1
+  rotate: false
+  xy: 335, 434
+  size: 440, 248
+  orig: 440, 248
   offset: 0, 0
   index: -1
 
@@ -125,10 +125,31 @@ gameatlas3.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-enemy2
+hpup
+  rotate: false
+  xy: 1, 189
+  size: 380, 186
+  orig: 380, 186
+  offset: 0, 0
+  index: -1
+shieldup
   rotate: false
   xy: 1, 1
-  size: 784, 338
-  orig: 784, 338
+  size: 380, 186
+  orig: 380, 186
+  offset: 0, 0
+  index: -1
+shootup
+  rotate: false
+  xy: 383, 189
+  size: 380, 186
+  orig: 380, 186
+  offset: 0, 0
+  index: -1
+speedup
+  rotate: false
+  xy: 383, 1
+  size: 380, 186
+  orig: 380, 186
   offset: 0, 0
   index: -1

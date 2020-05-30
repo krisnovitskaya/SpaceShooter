@@ -11,6 +11,7 @@ import java.util.List;
 
 import ru.geekbrains.base.BaseScreen;
 import ru.geekbrains.base.Font;
+import ru.geekbrains.base.Ship;
 import ru.geekbrains.controller.ScreenController;
 import ru.geekbrains.math.Rect;
 import ru.geekbrains.pool.BonusPool;
@@ -20,8 +21,12 @@ import ru.geekbrains.pool.ExplosionPool;
 import ru.geekbrains.sprite.Background;
 import ru.geekbrains.sprite.Bonus;
 import ru.geekbrains.sprite.Bullet;
+import ru.geekbrains.sprite.ButtonHome;
+import ru.geekbrains.sprite.ButtonMusic;
 import ru.geekbrains.sprite.ButtonNewGame;
+import ru.geekbrains.sprite.ButtonSound;
 import ru.geekbrains.sprite.Enemy;
+import ru.geekbrains.sprite.Explosion;
 import ru.geekbrains.sprite.GameOver;
 import ru.geekbrains.sprite.HPline;
 import ru.geekbrains.sprite.Star;
@@ -39,7 +44,7 @@ public class GameScreen extends BaseScreen {
     private static final String HP = "HP: ";
     private static final String LEVEL = "Level: ";
 
-    private enum State {PLAYING, GAME_OVER}
+    private enum State {PLAYING, GAME_OVER;}
     private Texture bg;
     private Background background;
     private TextureAtlas atlas;
@@ -55,14 +60,13 @@ public class GameScreen extends BaseScreen {
     private State state;
     private GameOver gameOver;
     private ButtonNewGame bNewGame;
+    private ButtonMusic buttonMusic;
+    private ButtonSound buttonSound;
+    private ButtonHome buttonHome;
     private int frags;
     private Font font;
     private StringBuilder sbFrags;
-    private StringBuilder sbHp;
-    private StringBuilder sbLevel;
     private HPline hPline;
-
-
 
 
     @Override
@@ -84,15 +88,22 @@ public class GameScreen extends BaseScreen {
         bonusPool = new BonusPool(worldBounds);
         bonusEmitter = new BonusEmitter(atlas, bonusPool);
         gameOver = new GameOver(atlas);
-        bNewGame = new ButtonNewGame(atlas, screenController, this);
+        bNewGame = new ButtonNewGame(atlas, this);
         font = new Font("font/font.fnt", "font/font.png");
         sbFrags = new StringBuilder();
-        sbHp = new StringBuilder();
-        sbLevel = new StringBuilder();
         music = Gdx.audio.newMusic(Gdx.files.internal("sound/music.mp3"));
         music.setLooping(true);
         music.play();
         state = State.PLAYING;
+        buttonHome = new ButtonHome(atlas);
+        buttonMusic = new ButtonMusic(atlas, music);
+        buttonSound = new ButtonSound(atlas, this);
+        mute(0);
+    }
+
+    public void mute(int frame) {
+        Ship.setMute(frame);
+        Explosion.setMute(frame);
     }
 
     @Override
@@ -116,6 +127,9 @@ public class GameScreen extends BaseScreen {
         bonusEmitter.resize(worldBounds);
         gameOver.resize(worldBounds);
         bNewGame.resize(worldBounds);
+        buttonSound.resize(worldBounds);
+        buttonHome.resize(worldBounds);
+        buttonMusic.resize(worldBounds);
         font.setSize(FONT_SIZE);
     }
 
@@ -151,17 +165,26 @@ public class GameScreen extends BaseScreen {
 
     @Override
     public boolean touchDown(Vector2 touch, int pointer, int button) {
-        if(state == State.PLAYING) {
-            starship.touchDown(touch, pointer, button);
-        }
-        if(state == State.GAME_OVER){
-            bNewGame.touchDown(touch, pointer, button);
+        if (!buttonHome.isMe(touch) && !buttonSound.isMe(touch) && !buttonMusic.isMe(touch)) {
+            if (state == State.PLAYING) {
+                starship.touchDown(touch, pointer, button);
+            }
+            if (state == State.GAME_OVER) {
+                bNewGame.touchDown(touch, pointer, button);
+            }
+        } else {
+            buttonHome.touchDown(touch, pointer, button);
+            buttonMusic.touchDown(touch, pointer, button);
+            buttonSound.touchDown(touch, pointer, button);
         }
         return false;
     }
 
     @Override
     public boolean touchUp(Vector2 touch, int pointer, int button) {
+        buttonHome.touchUp(touch, pointer, button);
+        buttonMusic.touchUp(touch, pointer, button);
+        buttonSound.touchUp(touch, pointer, button);
         if(state == State.PLAYING) {
             starship.touchUp(touch, pointer, button);
         }
@@ -263,13 +286,15 @@ public class GameScreen extends BaseScreen {
         for (Star star : stars) {
             star.draw(batch);
         }
+        buttonMusic.draw(batch);
+        buttonHome.draw(batch);
+        buttonSound.draw(batch);
         if (state == State.PLAYING) {
             starship.draw(batch);
             hPline.draw(batch);
             bonusPool.drawActiveSprites(batch);
             bulletPool.drawActiveSprites(batch);
             enemyPool.drawActiveSprites(batch);
-
         } else if (state == State.GAME_OVER) {
             gameOver.draw(batch);
             bNewGame.draw(batch);
@@ -281,14 +306,12 @@ public class GameScreen extends BaseScreen {
 
     private void printInfo() {
         sbFrags.setLength(0);
-        sbHp.setLength(0);
-        sbLevel.setLength(0);
         font.draw(batch, sbFrags.append(FRAGS).append(frags).append("\n").append(HP).append(starship.getHp()).append("\n").append(LEVEL).append(enemyEmitter.getLevel()), worldBounds.getLeft() + TEXT_MARGIN, worldBounds.getTop() - TEXT_MARGIN);
     }
+
     public ScreenController getScreenController() {
         return screenController;
     }
-
 
     public void setScreenController(ScreenController screenController) {
         this.screenController = screenController;
