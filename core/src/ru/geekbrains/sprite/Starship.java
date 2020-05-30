@@ -136,8 +136,6 @@ public class Starship extends Ship {
     protected void shoot() {
         super.shoot();
         if (bonusType == BonusType.SHOOT) {
-            Bullet bullet = bulletPool.obtain();
-            bullet.set(this, bulletRegion, bulletPos, bulletV, bulletHeight, worldBounds, damage);
             Bullet bullet2 = bulletPool.obtain();
             bulletPos.set(pos.x + getHalfWidth(), pos.y + getHalfHeight());
             bullet2.set(this, bulletRegion, bulletPos, bulletV, bulletHeight, worldBounds, damage);
@@ -150,7 +148,7 @@ public class Starship extends Ship {
 
     @Override
     public boolean touchDown(Vector2 touch, int pointer, int button) {
-        if (touch.x < worldBounds.pos.x) {
+        if (touch.x < this.pos.x) {
             if (leftPointer != INVALID_POINTER) {
                 return false;
             }
