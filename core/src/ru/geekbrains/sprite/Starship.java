@@ -3,6 +3,7 @@ package ru.geekbrains.sprite;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -12,13 +13,15 @@ import ru.geekbrains.base.Sprite;
 import ru.geekbrains.math.Rect;
 import ru.geekbrains.pool.BulletPool;
 import ru.geekbrains.pool.ExplosionPool;
+import ru.geekbrains.utils.BonusType;
 
 public class Starship extends Ship {
 
     private static final float SIZE = 0.15f;
     private static final float MARGIN = 0.05f;
     private static final int INVALID_POINTER = -1;
-    private static final int HP = 10;
+    private static final int HP_MAX = 100;
+    private static final int CLEAN_LEVEL_MAX = 3;
 
     private int leftPointer;
     private int rightPointer;
@@ -26,32 +29,57 @@ public class Starship extends Ship {
     private boolean pressedLeft;
     private boolean pressedRight;
 
+    private int level;
+    private int cleanLevelCounter;
+    private BonusType bonusType;
+    private final int BONUS_HP = 20;
+    private final float BONUS_TIME = 10f;
+    private final float RELOAD_INTERVAL = 0.25f;
+    private final float BONUS_RELOAD_INTERVAL = RELOAD_INTERVAL * 0.3f;
+    private float bonusTimer;
+    private Shield shield;
+
+    private Vector2 temp;
+
+    @Override
+    public void damage(int damage) {
+        if (bonusType != BonusType.SHIELD) {
+            super.damage(damage);
+            cleanLevelCounter = 0;
+        }
+    }
+
     public Starship(TextureAtlas atlas, BulletPool bulletPool, ExplosionPool explosionPool) {
-        super(atlas.findRegion("main_ship"), 1, 2, 2);
+        super(atlas.findRegion("starship2"), 1, 3, 3);
         this.bulletPool = bulletPool;
         this.explosionPool = explosionPool;
-        bulletRegion = atlas.findRegion("bulletMainShip");
+        bulletRegion = atlas.findRegion("bulletStarship");
         bulletV = new Vector2(0, 0.5f);
         bulletHeight = 0.01f;
         damage = 1;
         v0.set(0.5f, 0);
         leftPointer = INVALID_POINTER;
         rightPointer = INVALID_POINTER;
-        reloadInterval = 0.25f;
+        reloadInterval = RELOAD_INTERVAL;
         reloadTimer = reloadInterval;
-        hp = HP;
+        hp = HP_MAX;
         sound = Gdx.audio.newSound(Gdx.files.internal("sound/laser.wav"));
+        shield = new Shield(atlas, BONUS_TIME);
         startNewGame();
     }
 
     public void startNewGame() {
-        hp = HP;
+        hp = HP_MAX;
         leftPointer = INVALID_POINTER;
         rightPointer = INVALID_POINTER;
         pressedLeft = false;
         pressedRight = false;
+        cleanLevelCounter = 0;
+        level = 1;
         stop();
         this.pos.x = 0;
+        bonusType = BonusType.NONE;
+        temp = new Vector2();
         flushDestroy();
     }
 
@@ -60,11 +88,15 @@ public class Starship extends Ship {
         super.resize(worldBounds);
         setHeightProportion(SIZE);
         setBottom(worldBounds.getBottom() + MARGIN);
+        shield.resize(worldBounds, getHeight());
     }
 
     @Override
     public void update(float delta) {
         super.update(delta);
+        if (bonusType == BonusType.SPEED || bonusType == BonusType.SHIELD || bonusType == BonusType.SHOOT) {
+            bonusCheckAndUpdate(delta);
+        }
         bulletPos.set(pos.x, pos.y + getHalfHeight());
         autoShoot(delta);
         if (getLeft() < worldBounds.getLeft()) {
@@ -75,11 +107,48 @@ public class Starship extends Ship {
             stop();
             setRight(worldBounds.getRight());
         }
+        if (cleanLevelCounter >= CLEAN_LEVEL_MAX) {
+            frame = 2;
+        }
+
+    }
+
+    private void bonusCheckAndUpdate(float delta) {
+        switch (bonusType) {
+            case SPEED:
+                this.reloadInterval = BONUS_RELOAD_INTERVAL;
+                break;
+            case SHIELD:
+                shield.pos.set(this.pos);
+                this.reloadInterval = RELOAD_INTERVAL;
+                break;
+            case SHOOT:
+                this.reloadInterval = RELOAD_INTERVAL;
+        }
+        bonusTimer -= delta;
+        if (bonusTimer <= 0) {
+            this.bonusType = BonusType.NONE;
+            this.reloadInterval = RELOAD_INTERVAL;
+        }
+    }
+
+    @Override
+    protected void shoot() {
+        super.shoot();
+        if (bonusType == BonusType.SHOOT) {
+            Bullet bullet2 = bulletPool.obtain();
+            bulletPos.set(pos.x + getHalfWidth(), pos.y + getHalfHeight());
+            bullet2.set(this, bulletRegion, bulletPos, bulletV, bulletHeight, worldBounds, damage);
+            Bullet bullet3 = bulletPool.obtain();
+            bulletPos.set(pos.x - getHalfWidth(), pos.y + getHalfHeight());
+            bullet3.set(this, bulletRegion, bulletPos, bulletV, bulletHeight, worldBounds, damage);
+            sound.play(volumeSound);
+        }
     }
 
     @Override
     public boolean touchDown(Vector2 touch, int pointer, int button) {
-        if (touch.x < worldBounds.pos.x) {
+        if (touch.x < this.pos.x) {
             if (leftPointer != INVALID_POINTER) {
                 return false;
             }
@@ -180,5 +249,37 @@ public class Starship extends Ship {
 
     private void stop() {
         v.setZero();
+    }
+
+    public int getHpMax() {
+        return HP_MAX;
+    }
+
+    public void checkImba(int frags) {
+        int temp = frags / 10 + 1;
+        if (temp > level) {
+            level = temp;
+            cleanLevelCounter++;
+        }
+    }
+
+    public void bonusActivate(BonusType bonusType) {
+        if (bonusType == BonusType.HP) {
+            hp += BONUS_HP;
+            if (hp > HP_MAX) {
+                hp = HP_MAX;
+            }
+        } else {
+            this.bonusType = bonusType;
+            bonusTimer = BONUS_TIME;
+        }
+    }
+
+    @Override
+    public void draw(SpriteBatch batch) {
+        super.draw(batch);
+        if (bonusType == BonusType.SHIELD) {
+            shield.draw(batch);
+        }
     }
 }

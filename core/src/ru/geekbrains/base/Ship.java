@@ -35,6 +35,7 @@ public class Ship extends Sprite {
     protected int hp;
 
     private float damageAnimateTimer;
+    protected static float volumeSound;
 
     public Ship(TextureRegion region, int rows, int cols, int frames) {
         super(region, rows, cols, frames);
@@ -108,11 +109,19 @@ public class Ship extends Sprite {
     protected void shoot() {
         Bullet bullet = bulletPool.obtain();
         bullet.set(this, bulletRegion, bulletPos, bulletV, bulletHeight, worldBounds, damage);
-        sound.play();
+        sound.play(volumeSound);
     }
 
     private void boom() {
         Explosion explosion = explosionPool.obtain();
         explosion.set(getHeight(), pos);
+    }
+
+    public static void setMute(int frame) {
+        if (frame == 1) {
+            volumeSound = 0.0f;
+        } else {
+            volumeSound = 1f;
+        }
     }
 }
